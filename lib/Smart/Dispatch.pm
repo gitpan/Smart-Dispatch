@@ -9,7 +9,7 @@ use Smart::Dispatch::Match;
 
 BEGIN {
 	$Smart::Dispatch::AUTHORITY = 'cpan:TOBYINK';
-	$Smart::Dispatch::VERSION   = '0.001';
+	$Smart::Dispatch::VERSION   = '0.002';
 }
 
 use constant DEFAULT_MATCH_CLASS => (__PACKAGE__.'::Match');

@@ -22,9 +22,10 @@ my $dispatch = dispatcher {
 		failover { Carp::carp "failover"; "F" }
 };
 
-is scalar(my @x = $dispatch->all_matches), 6, 'all_matches';
-is scalar(my @x = $dispatch->conditional_matches), 5, 'conditional_matches';
-is scalar(my @x = $dispatch->unconditional_matches), 1, 'unconditional_matches';
+my @x;
+is scalar(@x = $dispatch->all_matches), 6, 'all_matches';
+is scalar(@x = $dispatch->conditional_matches), 5, 'conditional_matches';
+is scalar(@x = $dispatch->unconditional_matches), 1, 'unconditional_matches';
 
 is $dispatch->action(0),  'Zero';
 is $dispatch->action(3),  'Single digit 3';

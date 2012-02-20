@@ -8,7 +8,7 @@ use namespace::clean;
 
 BEGIN {
 	$Smart::Dispatch::Match::AUTHORITY = 'cpan:TOBYINK';
-	$Smart::Dispatch::Match::VERSION   = '0.001';
+	$Smart::Dispatch::Match::VERSION   = '0.002';
 }
 
 use constant {

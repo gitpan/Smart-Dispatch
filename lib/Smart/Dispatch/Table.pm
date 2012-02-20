@@ -15,7 +15,7 @@ use namespace::clean;
 
 BEGIN {
 	$Smart::Dispatch::Table::AUTHORITY = 'cpan:TOBYINK';
-	$Smart::Dispatch::Table::VERSION   = '0.001';
+	$Smart::Dispatch::Table::VERSION   = '0.002';
 }
 
 use overload
