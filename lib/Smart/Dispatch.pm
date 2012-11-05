@@ -4,12 +4,12 @@ use 5.010;
 use strict;
 
 use Carp;
-use Smart::Dispatch::Table;
-use Smart::Dispatch::Match;
+use Smart::Dispatch::Table ();
+use Smart::Dispatch::Match ();
 
 BEGIN {
 	$Smart::Dispatch::AUTHORITY = 'cpan:TOBYINK';
-	$Smart::Dispatch::VERSION   = '0.002';
+	$Smart::Dispatch::VERSION   = '0.003';
 }
 
 use constant DEFAULT_MATCH_CLASS => (__PACKAGE__.'::Match');
@@ -17,7 +17,7 @@ use constant DEFAULT_TABLE_CLASS => (__PACKAGE__.'::Table');
 
 our ($IN_FLIGHT, @LIST, @EXPORT);
 BEGIN
-{	
+{
 	$Carp::Internal{$_}++
 		foreach (__PACKAGE__, DEFAULT_MATCH_CLASS, DEFAULT_TABLE_CLASS);
 	$IN_FLIGHT = 0;
@@ -25,6 +25,7 @@ BEGIN
 	@EXPORT    = qw/dispatcher match match_using otherwise dispatch failover/;
 }
 
+use namespace::clean ();
 use Sub::Exporter -setup => {
 	exports => [
 		dispatcher   => \&_build_dispatcher,
@@ -33,19 +34,26 @@ use Sub::Exporter -setup => {
 		otherwise    => \&_build_otherwise,
 		dispatch     => \&_build_dispatch,
 		failover     => \&_build_failover,
-		],
+	],
 	groups => [
 		default      => [@EXPORT],
 		tiny         => [qw/dispatcher match/],
-		],
+	],
 	collectors => [qw/class/],
-	};
+	installer => sub {
+		namespace::clean::->import(
+			-cleanee => $_[0]{into},
+			grep { !ref } @{ $_[1] },
+		);
+		goto \&Sub::Exporter::default_installer;
+	},
+};
 
 sub _build_dispatcher
 {
 	my ($class, $name, $arg, $col) = @_;
 	my $table_class =
-		   $arg->{class}
+		$arg->{class}
 		// $col->{class}{table}
 		// DEFAULT_TABLE_CLASS;
 	
@@ -63,7 +71,7 @@ sub _build_match
 {
 	my ($class, $name, $arg, $col) = @_;
 	my $match_class =
-		   $arg->{class}
+		$arg->{class}
 		// $col->{class}{match}
 		// DEFAULT_MATCH_CLASS;
 	
@@ -80,7 +88,7 @@ sub _build_match_using
 {
 	my ($class, $name, $arg, $col) = @_;
 	my $match_class =
-		   $arg->{class}
+		$arg->{class}
 		// $col->{class}{match}
 		// DEFAULT_MATCH_CLASS;
 	
@@ -97,7 +105,7 @@ sub _build_otherwise
 {
 	my ($class, $name, $arg, $col) = @_;
 	my $match_class =
-		   $arg->{class}
+		$arg->{class}
 		// $col->{class}{match}
 		// DEFAULT_MATCH_CLASS;
 	
@@ -208,6 +216,10 @@ Smart::Dispatch is an attempt to combine some of the more useful features of
 C<given> with dispatch tables.
 
 =head2 Building a Dispatch Table
+
+All the keywords used a build a dispatch table are lexical subs, which
+means that you can import them into a particular code block and they
+will not be available outside that block.
 
 =head3 C<< dispatcher { CODE } >>
 

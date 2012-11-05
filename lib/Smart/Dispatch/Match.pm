@@ -1,14 +1,21 @@
 package Smart::Dispatch::Match;
 
+BEGIN {
+	*_TYPES = $ENV{PERL_SMART_DISPATCH_TYPE_CHECKS}==42
+		? sub () { 1 }
+		: sub () { 0 };
+};
+
 use 5.010;
-use Any::Moose;
+use Moo;
 use Carp;
+use if _TYPES, 'MooX::Types::MooseLike::Base', ':all';
 
 use namespace::clean;
 
 BEGIN {
 	$Smart::Dispatch::Match::AUTHORITY = 'cpan:TOBYINK';
-	$Smart::Dispatch::Match::VERSION   = '0.002';
+	$Smart::Dispatch::Match::VERSION   = '0.003';
 }
 
 use constant {
@@ -16,53 +23,61 @@ use constant {
 	FLAG_HAS_DISPATCH      =>  4,
 	FLAG_IS_FAILOVER       =>  8,
 	FLAG_IS_UNCONDITIONAL  => 16,
-	};
+};
 
 use overload
-	'&{}'  => sub { my $x=shift; sub { $x->conduct_dispatch($_[0]) } },
-	'~~'   => 'value_matches',
-	'+0'   => 'bitflags',
-	'bool' => 'bitflags';
+	'&{}'    => sub { my $x=shift; sub { $x->conduct_dispatch($_[0]) } },
+	'~~'     => 'value_matches',
+	bool     => sub { 1 },
+;
 
 has test => (
+	(_TYPES?(isa=>Any()):()),
 	is        => 'ro',
 	required  => 1,
-	);
+);
 
 has dispatch => (
+	(_TYPES?(isa=>CodeRef()):()),
 	is        => 'ro',
-	isa       => 'CodeRef',
 	required  => 0,
 	predicate => 'has_dispatch',
-	);
+);
 
 has value => (
+	(_TYPES?(isa=>Any()):()),
 	is        => 'ro',
 	required  => 0,
 	predicate => 'has_value',
-	);
+);
 
 has note => (
+	(_TYPES?(isa=>Str()):()),
 	is        => 'ro',
-	isa       => 'Str',
 	required  => 0,
-	);
+);
+
+has bitflags => (
+	(_TYPES?(isa=>Num()):()),
+	is        => 'lazy',
+	init_arg  => undef,
+);
 
 has is_failover => (
+	(_TYPES?(isa=>Bool()):()),
 	is        => 'ro',
-	isa       => 'Bool',
 	required  => 1,
-	default   => 0,
-	);
+	default   => sub { 0 },
+);
 
 has is_unconditional => (
+	(_TYPES?(isa=>Bool()):()),
 	is        => 'ro',
-	isa       => 'Bool',
 	required  => 1,
-	default   => 0,
-	);
+	default   => sub { 0 },
+);
 
-sub bitflags
+sub _build_bitflags
 {
 	my ($self) = @_;
 	my $rv = 1;
@@ -108,7 +123,8 @@ Smart::Dispatch::Match - an entry in a dispatch table
 
 =head1 DESCRIPTION
 
-Smart::Dispatch::Match is a Moose class. (L<Any::Moose> to be specific.)
+Smart::Dispatch::Match is a Moose class.
+(Well, L<Moo> actually, but close enough.)
 
 =head2 Constructor
 
@@ -196,8 +212,6 @@ Smart::Dispatch::Match overloads various operations. (See L<overload>.)
 =over
 
 =item * B<< code derefernce >> C<< &{} >> - C<conduct_dispatch>.
-
-=item * B<< numeric context >> C<< +0 >> - C<bitflags>.
 
 =item * B<< smart match >> C<< ~~ >> - C<value_matches>.
 

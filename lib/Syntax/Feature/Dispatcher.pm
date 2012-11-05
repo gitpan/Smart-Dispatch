@@ -5,7 +5,7 @@ use strict;
 
 BEGIN {
 	$Syntax::Feature::Dispatcher::AUTHORITY = 'cpan:TOBYINK';
-	$Syntax::Feature::Dispatcher::VERSION   = '0.002';
+	$Syntax::Feature::Dispatcher::VERSION   = '0.003';
 }
 
 sub install
@@ -27,6 +27,12 @@ Syntax::Feature::Dispatcher - use syntax qw/dispatcher/
 =head1 DESCRIPTION
 
 Tiny shim between L<Smart::Dispatch> and L<syntax>.
+
+=begin private
+
+=item install
+
+=end private
 
 =head1 BUGS
 

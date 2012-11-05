@@ -1,9 +1,16 @@
 package Smart::Dispatch::Table;
 
+BEGIN {
+	*_TYPES = $ENV{PERL_SMART_DISPATCH_TYPE_CHECKS}==42
+		? sub () { 1 }
+		: sub () { 0 };
+};
+
 use 5.010;
-use Any::Moose;
+use Moo;
 use Carp;
-use Scalar::Util qw/refaddr/;
+use Scalar::Util qw/ refaddr blessed /;
+use if _TYPES, 'MooX::Types::MooseLike::Base', ':all';
 
 sub _swap
 {
@@ -15,23 +22,24 @@ use namespace::clean;
 
 BEGIN {
 	$Smart::Dispatch::Table::AUTHORITY = 'cpan:TOBYINK';
-	$Smart::Dispatch::Table::VERSION   = '0.002';
+	$Smart::Dispatch::Table::VERSION   = '0.003';
 }
 
 use overload
-	'&{}'  => sub { my $x=shift; sub { $x->action($_[0]) } },
-	'+'    => sub { __PACKAGE__->make_combined(reverse _swap(@_)) },
-	'.'    => sub { __PACKAGE__->make_combined(_swap(@_)) },
-	'+='   => 'prepend',
-	'.='   => 'append',
-	'~~'   => 'exists',
-	'bool' => sub { 1 };
+	'&{}'    => sub { my $x=shift; sub { $x->action($_[0]) } },
+	'+'      => sub { __PACKAGE__->make_combined(reverse _swap(@_)) },
+	'.'      => sub { __PACKAGE__->make_combined(_swap(@_)) },
+	'+='     => 'prepend',
+	'.='     => 'append',
+	'~~'     => 'exists',
+	'bool'   => sub { 1 },
+;
 
 has match_list => (
+	(_TYPES?(isa=>ArrayRef()):()),
 	is        => 'rw',
-	isa       => 'ArrayRef[Smart::Dispatch::Match]',
 	required  => 1,
-	);
+);
 
 sub BUILD
 {
@@ -111,6 +119,7 @@ sub append
 	my $self = shift;
 	foreach my $other (@_)
 	{
+		next unless defined $other;
 		carp "Cannot add non-reference to dispatch table"
 			unless ref $other;
 		carp "Cannot add non-blessed reference to dispatch table"
@@ -122,7 +131,7 @@ sub append
 				$self->conditional_matches,
 				$other->conditional_matches,
 				($self->unconditional_matches ? $self->unconditional_matches : $other->unconditional_matches),
-				]);
+			]);
 		}
 		elsif ($other->isa('Smart::Dispatch::Match')
 		and not $other->is_unconditional)
@@ -131,7 +140,7 @@ sub append
 				$self->conditional_matches,
 				$other,
 				$self->unconditional_matches,
-				]);
+			]);
 		}
 		elsif ($other->isa('Smart::Dispatch::Match')
 		and $other->is_unconditional)
@@ -139,7 +148,7 @@ sub append
 			$self->match_list([
 				$self->conditional_matches,
 				($self->unconditional_matches ? $self->conditional_matches : $other),
-				]);
+			]);
 		}
 		else
 		{
@@ -156,6 +165,7 @@ sub prepend
 	my $self = shift;
 	foreach my $other (@_)
 	{
+		next unless defined $other;
 		carp "Cannot add non-reference to dispatch table"
 			unless ref $other;
 		carp "Cannot add non-blessed reference to dispatch table"
@@ -167,7 +177,7 @@ sub prepend
 				$other->conditional_matches,
 				$self->conditional_matches,
 				($other->unconditional_matches ? $other->unconditional_matches : $self->unconditional_matches),
-				]);
+			]);
 		}
 		elsif ($other->isa('Smart::Dispatch::Match')
 		and not $other->is_unconditional)
@@ -176,7 +186,7 @@ sub prepend
 				$other,
 				$self->conditional_matches,
 				$self->unconditional_matches,
-				]);
+			]);
 		}
 		elsif ($other->isa('Smart::Dispatch::Match')
 		and $other->is_unconditional)
@@ -184,7 +194,7 @@ sub prepend
 			$self->conditions([
 				$self->conditional_matches,
 				$other,
-				]);
+			]);
 		}
 		else
 		{
@@ -205,7 +215,8 @@ Smart::Dispatch::Table - a dispatch table
 
 =head1 DESCRIPTION
 
-Smart::Dispatch::Table is a Moose class. (L<Any::Moose> to be specific.)
+Smart::Dispatch::Table is a Moose class.
+(Well, L<Moo> actually, but close enough.)
 
 =head2 Constructors
 
@@ -288,6 +299,12 @@ appending, but if you've manipulated the match_list manually, it's
 good practice to all this method to check you've not broken it.
 
 =back
+
+=begin private
+
+=item BUILD
+
+=end private
 
 =head2 Overloads
 
