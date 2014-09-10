@@ -24,12 +24,12 @@ DESCRIPTION
      $dispatch{$thing}->();
 
     Dispatch tables are often more elegant than long groups of
-    "if"/"elsif"/"else" statements, but they do have drawbacks. Consider how
-    you'd change the example above to deal with $thing being not just "foo"
-    or "bar", but adding all integers to the allowed values.
+    `if`/`elsif`/`else` statements, but they do have drawbacks. Consider how
+    you'd change the example above to deal with $thing being not just "foo" or
+    "bar", but adding all integers to the allowed values.
 
-    Perl 5.10 introduced smart match and the "given" block. This allows
-    stuff like:
+    Perl 5.10 introduced smart match and the `given` block. This allows stuff
+    like:
 
      my $thing = get_foo_or_bar();
  
@@ -40,32 +40,32 @@ DESCRIPTION
        when (looks_like_number($_)) { ... }
      }
 
-    The conditions in "when" clauses can be arbirarily complex tests, and
+    The conditions in `when` clauses can be arbirarily complex tests, and
     default to comparisons using the smart match operator. This is far more
     flexible.
 
-    "given" blocks do have some drawbacks over dispatch tables though. A
-    dispatch table is a first class object - you can put a reference to it
-    in a variable, and pass that reference as an argument to functions. You
-    can check to see whether a dispatch table contains particular entries:
+    `given` blocks do have some drawbacks over dispatch tables though. A
+    dispatch table is a first class object - you can put a reference to it in
+    a variable, and pass that reference as an argument to functions. You can
+    check to see whether a dispatch table contains particular entries:
 
      if ($dispatch{"foo"})  # dispatch table can deal with $thing="foo"
 
     If passed a reference to an existing dispatch table, you can easily add
     entries to it, or remove entries from it.
 
-    Smart::Dispatch is an attempt to combine some of the more useful
-    features of "given" with dispatch tables.
+    Smart::Dispatch is an attempt to combine some of the more useful features
+    of `given` with dispatch tables.
 
   Building a Dispatch Table
     All the keywords used a build a dispatch table are lexical subs, which
-    means that you can import them into a particular code block and they
-    will not be available outside that block.
+    means that you can import them into a particular code block and they will
+    not be available outside that block.
 
-   "dispatcher { CODE }"
-    A dispatch table is built using the "dispatcher" function which takes a
+   `dispatcher { CODE }`
+    A dispatch table is built using the `dispatcher` function which takes a
     single block argument. This block will typically consist of a number of
-    "match" statements, though you can theoretically put anything you want
+    `match` statements, though you can theoretically put anything you want
     inside it. (The code is run just once, when the dispatch table is being
     built, and is called in void context.)
 
@@ -73,22 +73,22 @@ DESCRIPTION
 
     The return value is an Smart::Dispatch::Table object.
 
-   "match $test, %args"
-    The "match" function adds a single entry to the current dispatch table.
+   `match $test, %args`
+    The `match` function adds a single entry to the current dispatch table.
     The entry is a Smart::Dispatch::Match object.
 
-    The $test argument is the trigger for dispatching to that particular
-    entry in the table. It's like the contents of "when(...)" in a "given"
-    block. It is used as the right hand argument to a smart match operation
-    (see perlop), so it can be a string/numeric constant, "undef", a
-    "qr/.../" quoted regular expression, or a coderef, or an reference to an
-    array containing any of the above. (There are other possibilities too,
-    though they are somewhat obscure.)
+    The $test argument is the trigger for dispatching to that particular entry
+    in the table. It's like the contents of `when(...)` in a `given` block. It
+    is used as the right hand argument to a smart match operation (see
+    perlop), so it can be a string/numeric constant, `undef`, a `qr/.../`
+    quoted regular expression, or a coderef, or an reference to an array
+    containing any of the above. (There are other possibilities too, though
+    they are somewhat obscure.)
 
     The hash of other arguments is passed to the constructor of
     Smart::Dispatch::Match.
 
-   "dispatch { CODE }"
+   `dispatch { CODE }`
     This introduces the code to run when a match has been successful. It is
     used as follows:
 
@@ -104,48 +104,48 @@ DESCRIPTION
        match "bar", 'dispatch' => sub { my $x = get_simian(); return $x };
      };
 
-    So the only thing "dispatch" is doing is depositing a coderef into the
-    %args hash of "match".
+    So the only thing `dispatch` is doing is depositing a coderef into the
+    %args hash of `match`.
 
-   "value => $value"
-    In the case of the "Monkey" bit above, it's actually a little wasteful
-    to define a coderef (and run it when we do the dispatching later on)
-    just to return a constant string, so in this case we can use the 'value'
-    argument for "match", to provide a slight optimization:
+   `value => $value`
+    In the case of the "Monkey" bit above, it's actually a little wasteful to
+    define a coderef (and run it when we do the dispatching later on) just to
+    return a constant string, so in this case we can use the 'value' argument
+    for `match`, to provide a slight optimization:
 
      my $dispatch_table = dispatcher {
        match "foo", value => "Monkey";
        match "bar", dispatch { my $x = get_simian(); return $x };
      };
 
-    Note that "value" is not a function. It's just a named argument for
-    "match". Nothing much magic is going on.
+    Note that `value` is not a function. It's just a named argument for
+    `match`. Nothing much magic is going on.
 
-   "match_using { CODE } %args"
-    "match_using" is exactly like "match" but declared with a coderef
+   `match_using { CODE } %args`
+    `match_using` is exactly like `match` but declared with a coderef
     prototype (see perlsub). That is, it just gives you syntactic sugar for
     the case where $test is a coderef. The following are equivalent:
 
-    "match_using { $_ < 5 } dispatch { say "$_ is low" };"
-    "match sub { $_ < 5 }, 'dispatch' => sub { say "$_ is low" };"
+    `match_using { $_ < 5 } dispatch { say "$_ is low" };`
+    `match sub { $_ < 5 }, 'dispatch' => sub { say "$_ is low" };`
 
-   "otherwise %args"
-    "otherwise" is equivalent to "default" in "given" blocks, or "else" in
-    "if" blocks. It matches all other cases, and must thus be the last match
+   `otherwise %args`
+    `otherwise` is equivalent to `default` in `given` blocks, or `else` in
+    `if` blocks. It matches all other cases, and must thus be the last match
     declared.
 
     Again this is really just syntactic sugar. The following are equivalent:
 
-    "otherwise dispatch { undef };"
-    "match sub { 1 }, 'is_unconditional' => 1, 'dispatch' => sub { undef };"
+    `otherwise dispatch { undef };`
+    `match sub { 1 }, 'is_unconditional' => 1, 'dispatch' => sub { undef };`
 
-    Note that "otherwise" explicitly marks the match as an "unconditional"
-    match. This allows Smart::Dispatch to complain if "otherwise" is not the
+    Note that `otherwise` explicitly marks the match as an "unconditional"
+    match. This allows Smart::Dispatch to complain if `otherwise` is not the
     last match in a dispatch table. And it helps when you try to combine
     multiple dispatch tables to know which is the "otherwise" match.
 
-   "failover { CODE }"
-    This is roughly the same as "dispatch", but is intended for marking
+   `failover { CODE }`
+    This is roughly the same as `dispatch`, but is intended for marking
     dispatches that can be regarded as failures:
 
      my $roman = dispatcher {
@@ -163,18 +163,18 @@ DESCRIPTION
     table knows which matches are successes and which are failures, this
     information can be queried.
 
-    It should be no surprise by now that the "failover" function is just
+    It should be no surprise by now that the `failover` function is just
     syntactic sugar, and the same effect can be achieved without it. The
     following are equivalent:
 
-    "match $test, failover {...};"
-    "match $test, 'is_failover' => 1, 'dispatch' => sub {...};"
+    `match $test, failover {...};`
+    `match $test, 'is_failover' => 1, 'dispatch' => sub {...};`
 
   Using a Dispatch Table
-    OK, so now you know how to build a dispatch table, but once we've got
-    one, how can we use it?
+    OK, so now you know how to build a dispatch table, but once we've got one,
+    how can we use it?
 
-    Dispatch tables, although they are not coderefs, overload "&{}", which
+    Dispatch tables, although they are not coderefs, overload `&{}`, which
     means they can be called like coderefs.
 
      my $biological_sex = dispatcher {
@@ -188,11 +188,10 @@ DESCRIPTION
 
     The above will say "I am a Male".
 
-    Note that the dispatch and failover subs here are pretty boring (we
-    could have just used "<value">), but any arbitrary Perl function is
-    allowed. Perl functions of course accept argument lists. Any argument
-    list passed into the dispatch table will be passed on to the dispatched
-    function.
+    Note that the dispatch and failover subs here are pretty boring (we could
+    have just used `<value`>), but any arbitrary Perl function is allowed.
+    Perl functions of course accept argument lists. Any argument list passed
+    into the dispatch table will be passed on to the dispatched function.
 
      my $biological_sex = dispatcher {
        match 'XX',
@@ -207,7 +206,7 @@ DESCRIPTION
      say "I am a ", $biological_sex->($sex_chromosomes, 'en');
      say "Je suis ", $biological_sex->($sex_chromosomes, 'fr');
 
-    Note that within "match_using", "dispatch" and "failover" blocks, the
+    Note that within `match_using`, `dispatch` and `failover` blocks, the
     value being matched is available in the variable $_. The following match
     demonstrates this:
 
@@ -226,14 +225,13 @@ DESCRIPTION
        say $biological_sex->($sex_chromosomes);
      }
 
-    This is where "failover" comes in. Failover matches are not considered
-    when determining whether a dispatch table is capable of handling a
-    value.
+    This is where `failover` comes in. Failover matches are not considered
+    when determining whether a dispatch table is capable of handling a value.
 
   Manipulating Dispatch Tables
-    If you have an existing dispatch table, it's possible to add more
-    entries to it. For this purpose, Smart::Dispatch overloads the ".=" and
-    "+=" operators.
+    If you have an existing dispatch table, it's possible to add more entries
+    to it. For this purpose, Smart::Dispatch overloads the `.=` and `+=`
+    operators.
 
      my $more_sexes = dispatcher {
        match 'XYY',  dispatch { 'Supermale' };
@@ -241,8 +239,8 @@ DESCRIPTION
      };
      $biological_sex .= $more_sexes;
 
-    The difference between the two operators is the priority is which
-    matches are tested.
+    The difference between the two operators is the priority is which matches
+    are tested.
 
      my $match1 = dispatcher {
        match 1, dispatch { 'One' };
@@ -263,10 +261,10 @@ DESCRIPTION
        match qr{^1}, dispatch { 'Leading one' };
      };
 
-    Then when dispatching value "1", the result will be "Leading one"
-    because the newer matches are given higher priority.
+    Then when dispatching value "1", the result will be "Leading one" because
+    the newer matches are given higher priority.
 
-    It is also possible to use "." and "+" in their non-assignment forms:
+    It is also possible to use `.` and `+` in their non-assignment forms:
 
      my $enormous_match = $big_match . $large_match . $mighty_match;
 
@@ -275,36 +273,36 @@ DESCRIPTION
     subtraction, look at the internals of Smart::Dispatch::Table.)
 
     If one or both dispatch tables contain an unconditional match
-    ("otherwise"), then these will be combined intelligently. The result
-    will only have one unconditional match (the higher priority one).
+    (`otherwise`), then these will be combined intelligently. The result will
+    only have one unconditional match (the higher priority one).
 
   Import
     By default Smart::Dispatch exports the following functions:
 
-    *   "dispatch"
+    *   `dispatch`
 
-    *   "dispatcher"
+    *   `dispatcher`
 
-    *   "failover"
+    *   `failover`
 
-    *   "match"
+    *   `match`
 
-    *   "match_using"
+    *   `match_using`
 
-    *   "otherwise"
+    *   `otherwise`
 
     It is possible to only import a subset of those:
 
      use Smart::Dispatch qw/dispatcher match otherwise/;
 
     As noted in the "Building a Dispatch Table" section, a minimal set of
-    functions is just "dispatcher" and "match". All the others are just
+    functions is just `dispatcher` and `match`. All the others are just
     syntactic sugar. If you just want those two, then you can do:
 
      use Smart::Dispatch qw/:tiny/;
 
-    Smart::Dispatch uses Sub::Exporter which provides a dizzying array of
-    cool options, such as:
+    Smart::Dispatch uses Sub::Exporter which provides a dizzying array of cool
+    options, such as:
 
      use Smart::Dispatch -all => { -prefix => 'sd_' };
 
@@ -328,8 +326,8 @@ DESCRIPTION
          match => 'My::Dispatch::Match',
          };
 
-    Whatsmore, the "class" option can be set on a keyword-by-keyword basis
-    for "match", "match_using" and "otherwise".
+    Whatsmore, the `class` option can be set on a keyword-by-keyword basis for
+    `match`, `match_using` and `otherwise`.
 
      use Smart::Dispatch
        qw/dispatcher dispatch match/,
@@ -343,16 +341,16 @@ DESCRIPTION
          };
 
   Constants
-    *   "DEFAULT_MATCH_CLASS"
+    *   `DEFAULT_MATCH_CLASS`
 
-    *   "DEFAULT_TABLE_CLASS"
+    *   `DEFAULT_TABLE_CLASS`
 
   Dispatch Table Internals
     See Smart::Dispatch::Table and Smart::Dispatch::Match.
 
     Note that this is an early release, so the internals are still likely to
-    change somewhat between versions. The function-based API should be
-    fairly steady though.
+    change somewhat between versions. The function-based API should be fairly
+    steady though.
 
 BUGS
     Please report any bugs to
@@ -369,8 +367,8 @@ AUTHOR
 COPYRIGHT AND LICENCE
     This software is copyright (c) 2012 by Toby Inkster.
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
 
 DISCLAIMER OF WARRANTIES
     THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
