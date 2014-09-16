@@ -2,6 +2,7 @@ package Smart::Dispatch;
 
 use 5.010;
 use strict;
+use warnings;
 
 use Carp;
 use Smart::Dispatch::Table ();
@@ -9,7 +10,7 @@ use Smart::Dispatch::Match ();
 
 BEGIN {
 	$Smart::Dispatch::AUTHORITY = 'cpan:TOBYINK';
-	$Smart::Dispatch::VERSION   = '0.005';
+	$Smart::Dispatch::VERSION   = '0.006';
 }
 
 use constant DEFAULT_MATCH_CLASS => (__PACKAGE__.'::Match');

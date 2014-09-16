@@ -10,7 +10,7 @@ my $meta = {
                         "TOBYINK <tobyink\@cpan.org>",
                       ],
   "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640",
   "keywords"       => [],
   "license"        => ["perl_5"],
   "meta-spec"      => {
@@ -22,15 +22,20 @@ my $meta = {
   "prereqs"        => {
                         configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                         runtime => {
-                          requires => { "Moo" => 0, "namespace::clean" => 0, "Sub::Exporter" => 0 },
+                          requires => {
+                            "Moo" => 0,
+                            "namespace::clean" => 0,
+                            "perl" => "5.010",
+                            "Sub::Exporter" => 0,
+                          },
                         },
                         test => { requires => { "Test::More" => 0.61, "Test::Warn" => 0 } },
                       },
   "provides"       => {
-                        "Smart::Dispatch"             => { file => "lib/Smart/Dispatch.pm", version => 0.005 },
-                        "Smart::Dispatch::Match"      => { file => "lib/Smart/Dispatch/Match.pm", version => 0.005 },
-                        "Smart::Dispatch::Table"      => { file => "lib/Smart/Dispatch/Table.pm", version => 0.005 },
-                        "Syntax::Feature::Dispatcher" => { file => "lib/Syntax/Feature/Dispatcher.pm", version => 0.005 },
+                        "Smart::Dispatch"             => { file => "lib/Smart/Dispatch.pm", version => 0.006 },
+                        "Smart::Dispatch::Match"      => { file => "lib/Smart/Dispatch/Match.pm", version => 0.006 },
+                        "Smart::Dispatch::Table"      => { file => "lib/Smart/Dispatch/Table.pm", version => 0.006 },
+                        "Syntax::Feature::Dispatcher" => { file => "lib/Syntax/Feature/Dispatcher.pm", version => 0.006 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -39,9 +44,14 @@ my $meta = {
                                         },
                         homepage     => "https://metacpan.org/release/Smart-Dispatch",
                         license      => ["http://dev.perl.org/licenses/"],
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/Smart-Dispatch/project",
+                        repository   => {
+                                          type => "git",
+                                          url  => "git://github.com/tobyink/p5-smart-dispatch.git",
+                                          web  => "https://github.com/tobyink/p5-smart-dispatch",
+                                        },
+                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Smart-Dispatch/project",
                       },
-  "version"        => 0.005,
+  "version"        => 0.006,
 };
 
 my %dynamic_config;

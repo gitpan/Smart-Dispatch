@@ -2,10 +2,11 @@ package Syntax::Feature::Dispatcher;
 
 use 5.010;
 use strict;
+use warnings;
 
 BEGIN {
 	$Syntax::Feature::Dispatcher::AUTHORITY = 'cpan:TOBYINK';
-	$Syntax::Feature::Dispatcher::VERSION   = '0.005';
+	$Syntax::Feature::Dispatcher::VERSION   = '0.006';
 }
 
 sub install

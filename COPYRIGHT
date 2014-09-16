@@ -3,6 +3,15 @@ Upstream-Name: Smart-Dispatch
 Upstream-Contact: TOBYINK <tobyink@cpan.org> and Toby Inkster <tobyink@cpan.org>
 Source: https://metacpan.org/release/Smart-Dispatch
 
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/04exists.t
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: CONTRIBUTING
  INSTALL
  LICENSE
@@ -12,14 +21,6 @@ Files: CONTRIBUTING
 Copyright: Unknown
 License: Unknown
 
-Files: t/01basic.t
- t/02dispatcher.t
- t/03overloading.t
- t/04exists.t
- t/05subclassing.t
-Copyright: Copyright 2012 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: README
  lib/Smart/Dispatch.pm
  lib/Smart/Dispatch/Match.pm
@@ -28,12 +29,11 @@ Files: README
 Copyright: This software is copyright (c) 2012 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Changes
- META.json
- META.yml
- dist.ini
- doap.ttl
-Copyright: Copyright 2014 Toby Inkster.
+Files: t/01basic.t
+ t/02dispatcher.t
+ t/03overloading.t
+ t/05subclassing.t
+Copyright: Copyright 2012 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
